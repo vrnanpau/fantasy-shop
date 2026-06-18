@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fantasy Shop – Mercado de Mundos Imaginarios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --void:     #0a0812;
+      --deep:     #130e1f;
+      --panel:    #1c1530;
+      --border:   #2e2248;
+      --gold:     #c8a84b;
+      --gold2:    #f0d080;
+      --mana:     #7b4fcf;
+      --mana2:    #a87aff;
+      --ember:    #e05c30;
+      --text:     #e8e0f5;
+      --muted:    #8a7ea8;
+      --rare:     #4fa3e0;
+      --epic:     #b44fe0;
+      --leg:      #e0a020;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1060 0%, var(--void) 70%);
+      border-bottom: 1px solid var(--border);
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237b4fcf' fill-opacity='0.07'%3E%3Cpolygon points='30 0 60 30 30 60 0 30'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .site-title {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      color: var(--gold);
+      text-shadow: 0 0 30px #c8a84b88, 0 2px 6px #000;
+      position: relative;
+    }
+    .site-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+      position: relative;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.6rem;
+      position: relative;
+      flex-wrap: wrap;
+    }
+    nav button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all .2s;
+    }
+    nav button:hover, nav button.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: #c8a84b12;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── CATALOG ── */
+    .catalog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem 1rem;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+    .catalog-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .filter-bar { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .filter-bar button {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: .3rem .8rem;
+      border-radius: 20px;
+      font-size: .78rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-bar button:hover, .filter-bar button.active {
+      border-color: var(--mana2);
+      color: var(--mana2);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.2rem;
+      padding: 0 2rem 2rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px #7b4fcf44;
+    }
+    .card-img {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, #1a1030, #0f0820);
+      border-bottom: 1px solid var(--border);
+    }
+    .card-body { padding: 1rem; }
+    .card-name {
+      font-family: 'Cinzel', serif;
+      font-size: .9rem;
+      color: var(--text);
+      margin-bottom: .25rem;
+    }
+    .card-type { font-size: .72rem; color: var(--muted); margin-bottom: .5rem; }
+    .card-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-price {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: .95rem;
+    }
+    .badge {
+      font-size: .65rem;
+      padding: .15rem .5rem;
+      border-radius: 20px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .badge-comun    { background: #2a2a2a; color: #aaa; border: 1px solid #444; }
+    .badge-raro     { background: #0d2a40; color: var(--rare); border: 1px solid var(--rare); }
+    .badge-épico    { background: #200d40; color: var(--epic); border: 1px solid var(--epic); }
+    .badge-legendario{ background: #2a1d00; color: var(--leg); border: 1px solid var(--leg);
+                        box-shadow: 0 0 8px #e0a02055; }
+
+    /* Key ribbon */
+    .key-ribbon {
+      position: absolute; top: 10px; left: -24px;
+      background: var(--ember);
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: .2rem 2rem;
+      transform: rotate(-45deg);
+      text-transform: uppercase;
+      box-shadow: 0 2px 6px #0006;
+    }
+
+    /* ── DETAIL MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: #0009;
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px #7b4fcf55;
+      position: relative;
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #1e1040, #0f0820);
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-emoji { font-size: 4rem; display: block; margin-bottom: .5rem; }
+    .modal-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+    }
+    .modal-body { padding: 1.5rem; }
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+      gap: 1rem;
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-label { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+    .field-val { color: var(--text); text-align: right; }
+    .modal-close {
+      position: absolute; top: .8rem; right: .8rem;
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 1rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-buy {
+      display: block;
+      width: 100%;
+      margin-top: 1.2rem;
+      padding: .8rem;
+      background: linear-gradient(135deg, var(--mana), #4a28a0);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-buy:hover { opacity: .85; }
+
+    /* ── REGISTRO SECTION ── */
+    .registro-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .reg-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+      margin-bottom: 2rem;
+    }
+    .reg-table th {
+      background: var(--panel);
+      color: var(--muted);
+      font-family: 'Cinzel', serif;
+      font-size: .7rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .7rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .reg-table td {
+      padding: .7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.4;
+    }
+    .reg-table tr:last-child td { border-bottom: none; }
+    .reg-table tr:hover td { background: #ffffff06; }
+    .key-field { color: var(--ember); font-weight: 700; }
+    .type-tag {
+      display: inline-block;
+      background: #7b4fcf22;
+      border: 1px solid #7b4fcf55;
+      color: var(--mana2);
+      padding: .1rem .45rem;
+      border-radius: 3px;
+      font-size: .72rem;
+    }
+    .clave-box {
+      background: var(--panel);
+      border: 1px solid var(--ember);
+      border-radius: 6px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .clave-box h3 {
+      font-family: 'Cinzel', serif;
+      font-size: .85rem;
+      color: var(--ember);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .6rem;
+    }
+    .clave-box p { font-size: .84rem; line-height: 1.65; color: var(--text); }
+
+    /* ── FORM ── */
+    .form-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .9rem;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    label {
+      display: block;
+      font-size: .72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: .3rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      font-size: .88rem;
+      padding: .55rem .8rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--mana2); }
+    select option { background: var(--deep); }
+    textarea { resize: vertical; min-height: 70px; }
+    .btn-submit {
+      margin-top: 1.2rem;
+      width: 100%;
+      padding: .85rem;
+      background: linear-gradient(135deg, #c8a84b, #a07030);
+      border: none;
+      border-radius: 4px;
+      color: #0a0812;
+      font-family: 'Cinzel', serif;
+      font-size: .95rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-submit:hover { opacity: .88; }
+    .toast {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: #1a3a1a;
+      border: 1px solid #3a7a3a;
+      color: #7aff7a;
+      padding: .7rem 1.5rem;
+      border-radius: 4px;
+      font-size: .85rem;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.show { display: block; animation: fadeInOut 2.5s forwards; }
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ── CART ── */
+    .cart-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .8rem 1rem;
+      margin-bottom: .8rem;
+    }
+    .cart-emoji { font-size: 2rem; }
+    .cart-info { flex: 1; }
+    .cart-name { font-family: 'Cinzel', serif; font-size: .88rem; }
+    .cart-sub { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+    .cart-price { font-family: 'Cinzel', serif; color: var(--gold); }
+    .cart-remove {
+      background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem;
+    }
+    .cart-remove:hover { color: var(--ember); }
+    .cart-total {
+      text-align: right;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .cart-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 3rem 0;
+      font-size: .9rem;
+    }
+
+    /* Cart badge */
+    .cart-btn-wrap { position: relative; }
+    #cart-count {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--ember);
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #cart-count.show { display: flex; }
+
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: 1; }
+      .grid { padding: 0 1rem 2rem; }
+      .catalog-header { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">⚔️ Fantasy Shop</div>
+  <div class="site-sub">Mercado de Mundos Imaginarios</div>
+  <nav>
+    <button class="active" onclick="showView('catalog')">Catálogo</button>
+    <button onclick="showView('registro')">📋 Registro</button>
+    <button onclick="showView('agregar')">✦ Agregar ítem</button>
+    <div class="cart-btn-wrap">
+      <button onclick="showView('carrito')">🧳 Carrito</button>
+      <span id="cart-count"></span>
+    </div>
+  </nav>
+</header>
+
+<!-- ══════════════ CATALOG ══════════════ -->
+<div id="view-catalog" class="view active">
+  <div class="catalog-header">
+    <h2>Todos los ítems</h2>
+    <div class="filter-bar">
+      <button class="active" onclick="filterRareza(this,'')">Todos</button>
+      <button onclick="filterRareza(this,'Común')">Común</button>
+      <button onclick="filterRareza(this,'Raro')">Raro</button>
+      <button onclick="filterRareza(this,'Épico')">Épico</button>
+      <button onclick="filterRareza(this,'Legendario')">Legendario</button>
+    </div>
+  </div>
+  <div class="grid" id="product-grid"></div>
+</div>
+
+<!-- ══════════════ REGISTRO ══════════════ -->
+<div id="view-registro" class="view">
+  <div class="registro-wrap">
+    <div class="section-title">Diseño del Registro Principal</div>
+
+    <div class="clave-box">
+      <h3>🔑 Clave del Registro: código_item</h3>
+      <p>
+        El campo <strong>código_item</strong> fue elegido como clave porque identifica de forma
+        única e irrepetible cada producto del catálogo. A diferencia del nombre (que puede repetirse
+        para variantes de un mismo artículo) o del precio (que puede cambiar), el código es un
+        identificador alfanumérico asignado una sola vez y permanente.
+        Permite búsquedas eficientes, evita duplicados y es independiente de otros atributos del producto.
+      </p>
+    </div>
+
+    <table class="reg-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Campo</th>
+          <th>Tipo de dato</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td class="key-field">🔑 código_item</td>
+          <td><span class="type-tag">Cadena (String)</span></td>
+          <td>Identificador único del producto. Formato: 3 letras + 4 dígitos (ej: SWD0042). <strong>Clave del registro.</strong></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>nombre</td>
+          <td><span class="type-tag">Cadena (String)</span></td>
+          <td>Nombre del ítem fantástico (ej: "Espada de Frost").</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>tipo</td>
+          <td><span class="type-tag">Cadena (String)</span></td>
+          <td>Categoría del ítem: Arma, Armadura, Poción, Hechizo, Montura, Artefacto.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>mundo_origen</td>
+          <td><span class="type-tag">Cadena (String)</span></td>
+          <td>Universo ficticio del que proviene (ej: "Azeroth", "Middle-earth", "Azeroth").</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>rareza</td>
+          <td><span class="type-tag">Cadena (String)</span></td>
+          <td>Nivel de rareza: Común / Raro / Épico / Legendario.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>precio_monedas_oro</td>
+          <td><span class="type-tag">Real (Float)</span></td>
+          <td>Valor del ítem en Monedas de Oro. Puede tener decimales.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>stock</td>
+          <td><span class="type-tag">Entero (Integer)</span></td>
+          <td>Cantidad de unidades disponibles. Mínimo 0.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>poder_magico</td>
+          <td><span class="type-tag">Entero (Integer)</span></td>
+          <td>Nivel de poder mágico del ítem (escala 0–100).</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>descripcion</td>
+          <td><span class="type-tag">Texto (String largo)</span></td>
+          <td>Descripción narrativa del ítem y sus poderes especiales.</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>fecha_incorporacion</td>
+          <td><span class="type-tag">Fecha (Date)</span></td>
+          <td>Fecha en que el ítem fue agregado al catálogo. Formato: DD/MM/AAAA.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title" style="margin-top:2rem">Prompt utilizado con la IA</div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:1.2rem;font-size:.83rem;line-height:1.7;color:var(--muted);white-space:pre-wrap;">"Soy estudiante de Ingeniería en Sistemas. Necesito diseñar una app de e-Commerce temática llamada Fantasy Shop, un mercado de productos de mundos de fantasía y gaming. 
+
+Diseñá para mí el registro principal de la app indicando:
+- Nombre de cada campo
+- Tipo de dato esperado
+- Justificación de la clave elegida
+
+El registro debe ser claro, con al menos 8 campos, y la clave debe ser un campo que identifique de forma única e irrepetible cada producto."</div>
+
+    <div class="section-title" style="margin-top:2rem">Reflexión sobre el uso de IA</div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:1.2rem;font-size:.85rem;line-height:1.75;">
+      Utilizar IA para diseñar esta aplicación aceleró notablemente el proceso de modelado de datos. 
+      La herramienta ayudó a identificar qué campos son realmente necesarios para representar un producto 
+      de fantasía, sugiriendo atributos que no habría considerado de inmediato, como <em>mundo_origen</em> 
+      o <em>poder_magico</em>. La IA también justificó la elección de la clave de forma clara, 
+      explicando por qué el código_item es más confiable que el nombre o el precio. 
+      Durante el proceso, fue necesario ajustar algunos prompts para obtener respuestas más 
+      específicas al contexto del curso, lo que me permitió aprender que la calidad del resultado 
+      depende directamente de la precisión del pedido. En conclusión, la IA funcionó como un 
+      colaborador que acelera el diseño inicial, aunque las decisiones finales siempre 
+      requieren criterio propio.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ AGREGAR ══════════════ -->
+<div id="view-agregar" class="view">
+  <div class="form-wrap">
+    <div class="section-title">✦ Agregar ítem al catálogo</div>
+    <div class="form-grid">
+      <div>
+        <label>Código ítem *</label>
+        <input id="f-codigo" type="text" placeholder="SWD0042" maxlength="10"/>
+      </div>
+      <div>
+        <label>Nombre *</label>
+        <input id="f-nombre" type="text" placeholder="Espada de Frost"/>
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select id="f-tipo">
+          <option value="Arma">⚔️ Arma</option>
+          <option value="Armadura">🛡️ Armadura</option>
+          <option value="Poción">🧪 Poción</option>
+          <option value="Hechizo">✨ Hechizo</option>
+          <option value="Montura">🐉 Montura</option>
+          <option value="Artefacto">🔮 Artefacto</option>
+        </select>
+      </div>
+      <div>
+        <label>Rareza</label>
+        <select id="f-rareza">
+          <option>Común</option>
+          <option>Raro</option>
+          <option>Épico</option>
+          <option>Legendario</option>
+        </select>
+      </div>
+      <div>
+        <label>Mundo de origen</label>
+        <input id="f-mundo" type="text" placeholder="Middle-earth"/>
+      </div>
+      <div>
+        <label>Precio (Monedas de Oro)</label>
+        <input id="f-precio" type="number" placeholder="350" min="0"/>
+      </div>
+      <div>
+        <label>Stock</label>
+        <input id="f-stock" type="number" placeholder="5" min="0"/>
+      </div>
+      <div>
+        <label>Poder mágico (0–100)</label>
+        <input id="f-poder" type="number" placeholder="80" min="0" max="100"/>
+      </div>
+      <div class="full">
+        <label>Emoji del ítem</label>
+        <input id="f-emoji" type="text" placeholder="⚔️" maxlength="2"/>
+      </div>
+      <div class="full">
+        <label>Descripción</label>
+        <textarea id="f-desc" placeholder="Un arma forjada en las nieves eternas de Frostheim..."></textarea>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="agregarItem()">✦ Agregar al catálogo</button>
+  </div>
+</div>
+
+<!-- ══════════════ CARRITO ══════════════ -->
+<div id="view-carrito" class="view">
+  <div class="cart-wrap">
+    <div class="section-title">🧳 Tu carrito</div>
+    <div id="cart-list"></div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-header">
+      <span class="modal-emoji" id="m-emoji"></span>
+      <div class="modal-name" id="m-nombre"></div>
+    </div>
+    <div class="modal-body">
+      <div id="m-fields"></div>
+      <button class="btn-buy" onclick="addToCart()">Agregar al carrito</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── DATA ──
+  let products = [
+    { codigo:'SWD0001', nombre:'Espada de Frost', tipo:'Arma', mundo:'Azeroth', rareza:'Legendario', precio:1200, stock:2, poder:95, emoji:'⚔️', desc:'Forjada con cristales eternos del Polo Norte de Azeroth. Congela todo lo que toca.' },
+    { codigo:'STF0002', nombre:'Bastón del Archimago', tipo:'Arma', mundo:'Hogwarts', rareza:'Épico', precio:850, stock:4, poder:88, emoji:'🪄', desc:'Canalizador de magia arcana de máxima pureza. Amplifica hechizos en un 40%.' },
+    { codigo:'POT0003', nombre:'Poción de Invisibilidad', tipo:'Poción', mundo:'Middle-earth', rareza:'Raro', precio:320, stock:12, poder:60, emoji:'🧪', desc:'Elaborada por los Elfos de Rivendell. Duración: 10 minutos.' },
+    { codigo:'DRG0004', nombre:'Huevo de Dragón Negro', tipo:'Montura', mundo:'Westeros', rareza:'Legendario', precio:9999, stock:1, poder:100, emoji:'🥚', desc:'Solo para los más valientes. La montura definitiva del mundo conocido.' },
+    { codigo:'ARM0005', nombre:'Cota de Mithril', tipo:'Armadura', mundo:'Middle-earth', rareza:'Épico', precio:2200, stock:3, poder:92, emoji:'🛡️', desc:'Más liviana que la seda, más dura que el acero. Resistente a flechas élfica.' },
+    { codigo:'SPL0006', nombre:'Hechizo Bola de Fuego', tipo:'Hechizo', mundo:'Forgotten Realms', rareza:'Común', precio:120, stock:50, poder:45, emoji:'🔥', desc:'El hechizo ofensivo más popular entre magos novatos. Daño: 3d6.' },
+    { codigo:'ART0007', nombre:'Orbe de la Profecía', tipo:'Artefacto', mundo:'Cosmere', rareza:'Épico', precio:1800, stock:1, poder:90, emoji:'🔮', desc:'Muestra fragmentos del futuro posible. Úsalo con precaución.' },
+    { codigo:'POT0008', nombre:'Elixir de Vida', tipo:'Poción', mundo:'Final Fantasy', rareza:'Raro', precio:500, stock:8, poder:70, emoji:'💊', desc:'Restaura completamente HP y MP. Raramente encontrado fuera de las mazmorras.' },
+    { codigo:'ARM0009', nombre:'Yelmo del Dragón', tipo:'Armadura', mundo:'Skyrim', rareza:'Raro', precio:680, stock:5, poder:65, emoji:'🪖', desc:'Forjado con escamas de dragón anciano. +50 a Armadura, +20 a Fuego.' },
+    { codigo:'MNT0010', nombre:'Pegaso Lunar', tipo:'Montura', mundo:'Elden Ring', rareza:'Legendario', precio:5500, stock:1, poder:98, emoji:'🦄', desc:'Montura mística que solo aparece durante la luna llena.' },
+  ];
+
+  let currentFilter = '';
+  let activeItem = null;
+  let cart = [];
+
+  function rarBadge(r) {
+    const map = { 'Común':'comun','Raro':'raro','Épico':'épico','Legendario':'legendario' };
+    return `<span class="badge badge-${map[r]||'comun'}">${r}</span>`;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('product-grid');
+    const list = currentFilter ? products.filter(p => p.rareza === currentFilter) : products;
+    grid.innerHTML = list.map(p => `
+      <div class="card" onclick="openModal('${p.codigo}')">
+        ${p.rareza==='Legendario' ? '<div class="key-ribbon">Legendario</div>' : ''}
+        <div class="card-img">${p.emoji}</div>
+        <div class="card-body">
+          <div class="card-name">${p.nombre}</div>
+          <div class="card-type">${p.tipo} · ${p.mundo}</div>
+          <div class="card-bottom">
+            <span class="card-price">🪙 ${p.precio}</span>
+            ${rarBadge(p.rareza)}
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function filterRareza(btn, val) {
+    currentFilter = val;
+    document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid();
+  }
+
+  function openModal(cod) {
+    const p = products.find(x => x.codigo === cod);
+    if (!p) return;
+    activeItem = p;
+    document.getElementById('m-emoji').textContent = p.emoji;
+    document.getElementById('m-nombre').textContent = p.nombre;
+    document.getElementById('m-fields').innerHTML = `
+      <div class="field-row"><span class="field-label">Código</span><span class="field-val">${p.codigo}</span></div>
+      <div class="field-row"><span class="field-label">Tipo</span><span class="field-val">${p.tipo}</span></div>
+      <div class="field-row"><span class="field-label">Mundo</span><span class="field-val">${p.mundo}</span></div>
+      <div class="field-row"><span class="field-label">Rareza</span><span class="field-val">${rarBadge(p.rareza)}</span></div>
+      <div class="field-row"><span class="field-label">Precio</span><span class="field-val" style="color:var(--gold)">🪙 ${p.precio}</span></div>
+      <div class="field-row"><span class="field-label">Stock</span><span class="field-val">${p.stock} unidades</span></div>
+      <div class="field-row"><span class="field-label">Poder mágico</span><span class="field-val">${p.poder}/100</span></div>
+      <div class="field-row"><span class="field-label">Descripción</span><span class="field-val">${p.desc}</span></div>`;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal') || e.target.classList.contains('modal-close')) {
+      document.getElementById('modal').classList.remove('open');
+    }
+  }
+
+  function addToCart() {
+    if (!activeItem) return;
+    cart.push({ ...activeItem });
+    updateCartBadge();
+    document.getElementById('modal').classList.remove('open');
+    showToast(`✓ ${activeItem.nombre} agregado al carrito`);
+  }
+
+  function updateCartBadge() {
+    const badge = document.getElementById('cart-count');
+    if (cart.length > 0) {
+      badge.textContent = cart.length;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+
+  function renderCart() {
+    const el = document.getElementById('cart-list');
+    if (cart.length === 0) {
+      el.innerHTML = '<div class="cart-empty">Tu carrito está vacío.<br>Explorar el catálogo para agregar ítems.</div>';
+      return;
+    }
+    const total = cart.reduce((s, i) => s + i.precio, 0);
+    el.innerHTML = cart.map((p, i) => `
+      <div class="cart-item">
+        <span class="cart-emoji">${p.emoji}</span>
+        <div class="cart-info">
+          <div class="cart-name">${p.nombre}</div>
+          <div class="cart-sub">${p.tipo} · ${rarBadge(p.rareza)}</div>
+        </div>
+        <span class="cart-price">🪙 ${p.precio}</span>
+        <button class="cart-remove" onclick="removeCart(${i})">✕</button>
+      </div>`).join('') +
+      `<div class="cart-total">Total: 🪙 ${total} Monedas de Oro</div>`;
+  }
+
+  function removeCart(i) {
+    cart.splice(i, 1);
+    updateCartBadge();
+    renderCart();
+  }
+
+  function agregarItem() {
+    const cod    = document.getElementById('f-codigo').value.trim();
+    const nombre = document.getElementById('f-nombre').value.trim();
+    if (!cod || !nombre) { showToast('⚠ Código y Nombre son obligatorios'); return; }
+    if (products.find(p => p.codigo === cod)) { showToast('⚠ Ese código ya existe'); return; }
+    products.push({
+      codigo: cod,
+      nombre,
+      tipo:   document.getElementById('f-tipo').value,
+      mundo:  document.getElementById('f-mundo').value || 'Desconocido',
+      rareza: document.getElementById('f-rareza').value,
+      precio: parseFloat(document.getElementById('f-precio').value) || 0,
+      stock:  parseInt(document.getElementById('f-stock').value) || 0,
+      poder:  parseInt(document.getElementById('f-poder').value) || 0,
+      emoji:  document.getElementById('f-emoji').value || '🗡️',
+      desc:   document.getElementById('f-desc').value || 'Sin descripción.',
+    });
+    ['f-codigo','f-nombre','f-mundo','f-precio','f-stock','f-poder','f-emoji','f-desc']
+      .forEach(id => document.getElementById(id).value = '');
+    showToast('✓ Ítem agregado al catálogo');
+    showView('catalog');
+  }
+
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelectorAll('nav button').forEach((b, i) => {
+      b.classList.toggle('active', ['catalog','registro','agregar','carrito'][i] === name);
+    });
+    if (name === 'catalog') renderGrid();
+    if (name === 'carrito') renderCart();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.remove('show');
+    void t.offsetWidth;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // Init
+  renderGrid();
+</script>
+</body>
+</html>
